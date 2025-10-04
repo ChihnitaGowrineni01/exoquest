@@ -20,9 +20,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const navItems = [
     { path: "/", label: "Home" },
-    { path: "/model", label: "Model Description" },
+    { path: "/model", label: "Overview" },
     { path: "/inference", label: "Inference" },
-    { path: "/dashboard", label: "Dashboard" },
   ];
 
   return (

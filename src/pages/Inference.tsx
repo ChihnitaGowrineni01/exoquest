@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, Sparkles, Info, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, Sparkles, Info, CheckCircle, AlertCircle, GitCompare  } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 export default function Inference() {
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -154,6 +155,18 @@ export default function Inference() {
                 </>
               )}
             </Button>
+
+            <Link to="/dashboard" className="flex-[1]">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full border-secondary/50 gradient-cosmic glow-primary"
+                disabled={!file || !selectedModel || isLoading}
+              >
+                <GitCompare className="w-5 h-5 mr-2" />
+                Compare Data to Training
+              </Button>
+            </Link>
 
             <Dialog>
               <DialogTrigger asChild>

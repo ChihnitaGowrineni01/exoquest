@@ -46,7 +46,7 @@ export default function Home() {
         <FeatureCard
           icon={<Telescope className="w-10 h-10" />}
           title="Multi-Mission Support"
-          description="Compatible with datasets from Kepler, K2, TESS, and other NASA exoplanet survey missions."
+          description="Compatible with datasets from NASA’s exoplanet survey missions — Kepler, K2, and TESS."
           gradient="from-accent to-secondary"
         />
       </div>
