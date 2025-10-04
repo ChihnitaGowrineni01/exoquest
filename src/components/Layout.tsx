@@ -34,7 +34,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group">
               <div className="relative">
-                <Rocket className="w-8 h-8 text-primary group-hover:text-accent transition-colors animate-float" />
+                <Rocket className="w-8 h-8 text-primary group-hover:text-accent transition-colors" />
                 <div className="absolute inset-0 blur-xl bg-primary/20 group-hover:bg-accent/20 transition-colors" />
               </div>
               <span className="text-2xl font-bold gradient-text">ExoQuest</span>
