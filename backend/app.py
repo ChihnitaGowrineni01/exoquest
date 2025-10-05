@@ -22,6 +22,15 @@ models = {
     'tess': ExoplanetModel('tess')
 }
 
+def make_serializable(obj):
+    if isinstance(obj, (np.integer, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64)):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    return obj
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -36,9 +45,12 @@ def predict():
             return jsonify({'error': 'No file uploaded'}), 400
         
         file = request.files['file']
-        model_type = request.form.get('model', 'kepler')
+        model_type = request.form.get('model')
+
+        if not model_type:
+            return jsonify({'error': 'Model type not provided'}), 400
         
-        if file.filename == '':
+        if file.filename == '': 
             return jsonify({'error': 'No file selected'}), 400
         
         if not allowed_file(file.filename):
@@ -54,22 +66,29 @@ def predict():
         model = models[model_type]
         predictions = model.predict(df)
         
+        if model_type == 'tess':
+            star_ids = ('TIC ' + df['tid'].fillna('').astype(str)).tolist()
+            important_features = ['Planet radius', 'Transit duration', 'Planet orbital period']
+
+        else:
+            star_ids = {f"KIC-{10000000 + idx * 12345}" for idx in range(df)}
+            important_features = ['orbital_period', 'planet_radius', 'transit_depth']
+
+
         # Format results
         results = []
         for idx, pred in enumerate(predictions):
-            results.append({
-                'id': idx + 1,
-                'star_id': f"KIC-{10000000 + idx * 12345}",
+            results_dict = {'id': idx + 1,
+                'star_id': star_ids[idx],
                 'classification': pred['classification'],
-                'confidence': pred['confidence'],
-                'orbital_period': pred.get('orbital_period', 'N/A'),
-                'planet_radius': pred.get('planet_radius', 'N/A'),
-                'transit_depth': pred.get('transit_depth', 'N/A')
-            })
+                'confidence': pred['confidence']}
+            for each in important_features:
+                results_dict[each] = pred.get(each, 'N/A')
+            results.append(results_dict)
         
         return jsonify({
             'success': True,
-            'results': results,
+            'results': [ {k: make_serializable(v) for k, v in r.items()} for r in results ],
             'total': len(results),
             'model_used': model_type
         })
