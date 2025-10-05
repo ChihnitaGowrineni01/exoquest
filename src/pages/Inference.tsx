@@ -220,52 +220,88 @@ export default function Inference() {
         </CardContent>
       </Card>
 
-      {/* Results Section */}
-      {results.length > 0 && (
-        <Card className="glass-card border-border/50 animate-fade-in">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-accent" />
-              Prediction Results
-            </CardTitle>
-            <CardDescription>
-              AI-powered classification of {results.length} observations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Star ID</TableHead>
-                    <TableHead>Classification</TableHead>
-                    <TableHead>Confidence</TableHead>
-                    <TableHead>Orbital Period (days)</TableHead>
-                    <TableHead>Planet Radius (R⊕)</TableHead>
-                    <TableHead>Transit Depth (ppm)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map((result) => (
-                    <TableRow key={result.id} className="hover:bg-primary/5">
-                      <TableCell className="font-mono">{result.star_id}</TableCell>
-                      <TableCell>
-                        <ClassificationBadge classification={result.classification} />
-                      </TableCell>
-                      <TableCell>
-                        <span className="font-semibold text-primary">{result.confidence}%</span>
-                      </TableCell>
-                      <TableCell>{result.orbital_period}</TableCell>
-                      <TableCell>{result.planet_radius}</TableCell>
-                      <TableCell>{result.transit_depth}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+          {results.length > 0 && (
+            <Card className="glass-card border-border/50 animate-fade-in">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="w-6 h-6 text-accent" />
+                  Prediction Results
+                </CardTitle>
+                <CardDescription>
+                  AI-powered classification of {results.length} observations
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        {["star_id", "classification", "confidence"]
+                          .concat(
+                            Object.keys(results[0]).filter(
+                              (k) =>
+                                !["star_id", "classification", "confidence", "id"].includes(k)
+                            )
+                          )
+                          .map((key) => (
+                            <TableHead key={key}>
+                              {key
+                                .replace(/_/g, " ")
+                                .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            </TableHead>
+                          ))}
+                      </TableRow>
+                    </TableHeader>
+
+                    <TableBody>
+                      {results.map((row, i) => (
+                        <TableRow key={i} className="hover:bg-primary/5">
+                          {["star_id", "classification", "confidence"]
+                            .concat(
+                              Object.keys(row).filter(
+                                (k) =>
+                                  !["star_id", "classification", "confidence", "id"].includes(k)
+                              )
+                            )
+                            .map((key) => (
+                              <TableCell key={key}>
+                                {key === "classification" ? (
+                                  <span
+                                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                      row[key] === "CANDIDATE"
+                                        ? "bg-blue-900/40 text-blue-300 border border-blue-500/50"
+                                        : row[key] === "CONFIRMED"
+                                        ? "bg-green-900/40 text-green-300 border border-green-500/50"
+                                        : row[key] === "FALSE POSITIVE"
+                                        ? "bg-red-900/40 text-red-300 border border-red-500/50"
+                                        : "bg-gray-800/40 text-gray-300 border border-gray-600/50"
+                                    }`}
+                                  >
+                                    {row[key]}
+                                  </span>
+                                ) : key === "confidence" ? (
+                                  <span className="font-semibold text-primary">
+                                    {Number(row[key]).toFixed(2)}%
+                                  </span>
+                                ) : (
+                                  <span className="font-mono">
+                                    {typeof row[key] === "number"
+                                      ? Number(row[key]).toFixed(2)
+                                      : row[key]}
+                                  </span>
+                                )}
+                              </TableCell>
+                            ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
     </div>
   );
 }
