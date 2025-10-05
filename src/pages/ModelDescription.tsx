@@ -15,7 +15,7 @@ export default function ModelDescription() {
 
       {/* Model Tabs */}
       <Tabs defaultValue="kepler" className="mb-12">
-        <TabsList className="grid w-full grid-cols-3 glass-card p-2">
+        <TabsList className="grid w-full grid-cols-3 glass-card">
           <TabsTrigger value="kepler" className="data-[state=active]:gradient-cosmic">
             Kepler Model
           </TabsTrigger>
@@ -64,17 +64,74 @@ export default function ModelDescription() {
         <TabsContent value="tess">
           <ModelCard
             mission="TESS"
-            description="Trained on TESS (Transiting Exoplanet Survey Satellite) data from 2018 onwards, optimized for all-sky survey observations with shorter observation periods."
-            algorithm="Deep Neural Network (5 layers, 256 neurons)"
-            accuracy="97.2%"
+            description={
+              <span>
+                The Transiting Exoplanet Survey Satellite (TESS) is a NASA mission launched in 2018 to discover exoplanets 
+                by observing periodic dips in the brightness of over 200,000 nearby stars.
+                <br /><br />
+                The TESS Objects of Interest (TOI) dataset catalogs potential and confirmed planets, including  
+                <em> APC</em> (ambiguous planetary candidate), <em>CP</em> (confirmed planet), <em>FA/FP</em> (false positive), 
+                <em> KP</em> (known planet), and <em>PC</em> (planetary candidate). These are standardized into three categories — 
+                <strong> Confirmed</strong>, <strong>Candidate</strong>, and <strong>False Positive</strong> — for model training.
+                <br /><br />
+                A <strong>LightGBM classifier</strong>, optimized with <strong>Bayesian hyperparameter tuning</strong> on the 
+                <em> macro-F1 score</em>, achieved strong generalization performance:
+                <br /><br />
+                • <strong>Accuracy:</strong> 77% on test data <br />
+                • <strong>Macro-F1:</strong> 65% (Weighted-F1: 76%) <br />
+                • <strong>Macro-AUC:</strong> 83.1% (Weighted-F1: 81.2%) <br />
+                <br />
+                <strong>Observation:</strong> The <strong>CANDIDATE</strong> class demonstrates high recall (91%) and F1 scores (85%), 
+                while <strong>CONFIRMED</strong> and <strong>FALSE POSITIVE</strong> samples are occasionally misclassified 
+                as candidates. However, confusion between confirmed and false positives remains minimal (1.7% and 4.3% misclassified as each other), an expected trend 
+                given the stronger photometric similarity of both to planetary candidates rather than to each other.
+                
+              </span>
+            }
+
+            algorithm={
+              <>
+                <span className="font-semibold text-lg text-primary">LightGBM</span>{" "}
+                <em className="text-muted-foreground">(Light Gradient Boosting Machine)</em>
+                <br />
+                <span className="text-sm text-amber-300">
+                  Tuned Hyperparameters:&nbsp;
+                  <span className="text-muted-foreground">
+                    n_estimators, max_depth, num_leaves, min_child_samples, learning_rate, subsample, colsample_bytree
+                  </span>
+                </span>
+              </>
+            }
+            accuracy={
+                <div>
+                  <div className="text-5xl font-extrabold tracking-tight leading-none text-secondary [font-variant-numeric:tabular-nums]">
+                    77%
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.65</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.76</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.831</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Weighted-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.812</span>
+                    </span>
+                  </div>
+                </div>
+              }
             features={[
-              "Transit Frequency",
-              "Light Curve Morphology",
-              "Stellar Classification",
-              "Planetary Equilibrium Temp",
-              "Insolation Flux",
-              "Density Estimation"
+              "Planet Radius (pl_rade)",
+              "Transit Duration (pl_trandurh)",
+              "Proper Motion (st_pmra / st_pmdec)",
+              "Transit Period (pl_orbper)",
+              "Distance (st_dist)",
+              "Stellar logg (from Stellar Teff / logg / Radius)",
             ]}
+
           />
         </TabsContent>
       </Tabs>
