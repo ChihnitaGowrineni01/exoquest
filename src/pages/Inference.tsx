@@ -113,8 +113,8 @@ export default function Inference() {
                 <SelectValue placeholder="Choose a model..." />
               </SelectTrigger>
               <SelectContent className="glass-card border-border/50">
-                <SelectItem value="kepler">Kepler Mission (96.8% accuracy)</SelectItem>
-                <SelectItem value="k2">K2 Mission (95.3% accuracy)</SelectItem>
+                <SelectItem value="kepler">Kepler Mission (87% accuracy)</SelectItem>
+                <SelectItem value="k2">K2 Mission (92% accuracy)</SelectItem>
                 <SelectItem value="tess">TESS Mission (77% accuracy)</SelectItem>
               </SelectContent>
             </Select>
@@ -167,7 +167,7 @@ export default function Inference() {
               )}
             </Button>
 
-            <Link to="/dashboard" className="flex-[1]">
+            {/* <Link to="/dashboard" className="flex-[1]">
               <Button
                 variant="secondary"
                 size="lg"
@@ -177,7 +177,7 @@ export default function Inference() {
                 <GitCompare className="w-5 h-5 mr-2" />
                 Compare Data to Training
               </Button>
-            </Link>
+            </Link> */}
 
             <Dialog>
               <DialogTrigger asChild>
@@ -234,11 +234,11 @@ export default function Inference() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        {["star_id", "classification", "confidence"]
+                        {["star_id", "classification", "Porbability Score"]
                           .concat(
                             Object.keys(results[0]).filter(
                               (k) =>
-                                !["star_id", "classification", "confidence", "id"].includes(k)
+                                !["star_id", "classification", "Porbability Score", "id"].includes(k)
                             )
                           )
                           .map((key) => (
@@ -254,11 +254,11 @@ export default function Inference() {
                     <TableBody>
                       {results.map((row, i) => (
                         <TableRow key={i} className="hover:bg-primary/5">
-                          {["star_id", "classification", "confidence"]
+                          {["star_id", "classification", "Porbability Score"]
                             .concat(
                               Object.keys(row).filter(
                                 (k) =>
-                                  !["star_id", "classification", "confidence", "id"].includes(k)
+                                  !["star_id", "classification", "Porbability Score", "id"].includes(k)
                               )
                             )
                             .map((key) => (
@@ -277,7 +277,7 @@ export default function Inference() {
                                   >
                                     {row[key]}
                                   </span>
-                                ) : key === "confidence" ? (
+                                ) : key === "Porbability Score" ? (
                                   <span className="font-semibold text-primary">
                                     {Number(row[key]).toFixed(2)}%
                                   </span>

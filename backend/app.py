@@ -69,10 +69,16 @@ def predict():
         if model_type == 'tess':
             star_ids = ('TIC ' + df['tid'].fillna('').astype(str)).tolist()
             important_features = ['Planet radius', 'Transit duration', 'Planet orbital period']
-
+        elif model_type == 'kepler':
+            star_ids = ('KIC ' + df['kepid'].fillna('').astype(str)).tolist()
+            important_features = ['Planet orbital period', 'Planet Radius', 'Transit Depth']
+        elif model_type == 'k2':
+            star_ids = (df['hostname'].fillna('').astype(str)).tolist()
+            important_features = ['Planet radius', 'Transit duration', 'Planet orbital period']
         else:
             star_ids = {f"KIC-{10000000 + idx * 12345}" for idx in range(df)}
             important_features = ['orbital_period', 'planet_radius', 'transit_depth']
+        
 
 
         # Format results
@@ -81,7 +87,7 @@ def predict():
             results_dict = {'id': idx + 1,
                 'star_id': star_ids[idx],
                 'classification': pred['classification'],
-                'confidence': pred['confidence']}
+                'Porbability Score': pred['Porbability Score']}
             for each in important_features:
                 results_dict[each] = pred.get(each, 'N/A')
             results.append(results_dict)

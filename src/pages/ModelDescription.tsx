@@ -1,7 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Layers, Zap, Target, Database, TrendingUp } from "lucide-react";
+import { Brain, Layers, Zap, Target, Database, TrendingUp, LineChart  } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 
 export default function ModelDescription() {
   return (
@@ -43,9 +45,9 @@ export default function ModelDescription() {
               A <strong>LightGBM classifier</strong>, optimized with <strong>Bayesian hyperparameter tuning</strong> 
               (via <em>BayesSearchCV</em>) on the <em>macro-F1 score</em>, achieved strong generalization performance:
               <br /><br />
-              • <strong>Accuracy:</strong> 88% on test data <br />
+              • <strong>Accuracy:</strong> 87% on test data <br />
               • <strong>Macro-F1:</strong> 83% (Weighted-F1: 87%) <br />
-              • <strong>Macro-AUC:</strong> 96% (Weighted-AUC: 96.8%) <br />
+              • <strong>Class-wise F1 Scores:</strong> Confirmed (92%), Candidate (65%), False Positive (92%) <br />
               <br />
               <strong>Observation:</strong> The <strong>CANDIDATE</strong> class demonstrates moderate performance with a lower recall (59%) and F1-score (66%), 
               indicating that many candidate planets are being misclassified as either <strong>CONFIRMED</strong> or <strong>FALSE POSITIVE</strong>. 
@@ -71,14 +73,14 @@ export default function ModelDescription() {
             accuracy={
               <div>
                   <div className="text-5xl font-extrabold tracking-tight leading-none text-secondary [font-variant-numeric:tabular-nums]">
-                    88%
+                    87%
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs">
                     <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
                       Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.83</span>
                     </span>
                     <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
-                      Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.81</span>
+                      Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.87</span>
                     </span>
                     <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
                       Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.96</span>
@@ -109,53 +111,59 @@ export default function ModelDescription() {
           <ModelCard
             mission="K2"
             description={
-            <span>
-              The <strong>K2 Mission</strong>The K2 Mission (2014–2018), NASA’s extended phase of the Kepler mission, was launched to continue the search for exoplanets after Kepler’s partial hardware failure. By observing different regions along the ecliptic plane, K2 captured high-precision light curves of thousands of stars to detect periodic dips in brightness caused by transiting planets.Each detected signal was analyzed and categorized into one of three standardized classes—Confirmed, Candidate, or False Positive. 
-              <br /><br />
-              The K2 dataset includes planetary status labels such as  
-              <em> Confirmed, Candidate, False Positive, Refuted. </em>
-              These are standardized into three categories — 
-              <strong> Confirmed</strong>, <strong>Candidate</strong>, and <strong>False Positive</strong> — for model training.
-              <br /><br />
-              A <strong>CatBoost classifier</strong>, is used to achieve strong generalization performance:
-              <br /><br />
-              • <strong>Accuracy:</strong> 79.3%  on test data <br />
-              • <strong>Macro-F1:</strong> 75.5% (Weighted-F1: 77.4%) <br />
-              • <strong>Macro-AUC:</strong> 94.4% <br />
-              <br />
-              <strong>Observation:</strong> The <strong>CatBoost model</strong> demonstrates excellent overall classification performance, achieving high precision and balanced F1 scores across all categories. The <strong>CONFIRMED</strong> class shows particularly strong results with a recall of approximately <em>0.99</em>, indicating that nearly all true confirmed exoplanets are correctly identified. The <strong>CANDIDATE</strong> class maintains high recall with a slight drop due to occasional misclassifications as confirmed planets, an expected outcome given their astrophysical similarity and overlapping orbital or photometric patterns. The <strong>FALSE POSITIVE</strong> class exhibits high precision (~<em>0.91</em>), showing that the model rarely mistakes genuine planetary signals for spurious detections. Most confusion occurs between <strong>CANDIDATE</strong> and <strong>CONFIRMED</strong> categories, consistent with real mission behavior where many candidates later become validated planets. Misclassification between <strong>CONFIRMED</strong> and <strong>FALSE POSITIVE</strong> cases remains minimal (1–2%), highlighting the model’s strong ability to distinguish true exoplanet signals from noise or instrumental artifacts.
-            </span>
-         }
+              <span>
+                The K2 Mission (2014–2018), NASA’s extended phase of the Kepler mission, was launched to continue the search for exoplanets 
+                after Kepler’s partial hardware failure. By observing different regions along the ecliptic plane, K2 captured high-precision 
+                light curves of thousands of stars to detect periodic dips in brightness caused by transiting planets.
+                <br /><br />
+                
+                A <strong>LightGBM classifier</strong>, optimized using <strong>Bayesian hyperparameter tuning</strong> on the 
+                <em> macro-F1 score</em>, demonstrated robust classification performance:
+                <br /><br />
+                • <strong>Accuracy:</strong> 92% on test data <br />
+                • <strong>Macro-F1:</strong> 89% (Weighted-F1: 92%) <br />
+                • <strong>Class-wise F1 Scores:</strong> Confirmed (96%), Candidate (89%), False Positive (84%) <br />
+                <br />
+                <strong>Observation:</strong> The <strong>CONFIRMED</strong> class shows outstanding performance with high precision (95%) 
+                and recall (97%), correctly identifying nearly all true exoplanets. The <strong>CANDIDATE</strong> class maintains strong 
+                recall (88%), though it is occasionally misclassified as confirmed — a natural outcome given their overlapping photometric 
+                features. The <strong>FALSE POSITIVE</strong> class exhibits solid precision (88%) and balanced performance, indicating the 
+                model rarely confuses spurious signals for genuine planets. Misclassification between <strong>CONFIRMED</strong> and 
+                <strong> FALSE POSITIVE</strong> remains minimal (1–2%), validating the model’s ability to distinguish real exoplanet signals 
+                from noise or artifacts.
+              </span>
+            }
             algorithm={
-                  <>
-                    <span className="font-semibold text-lg text-primary">CatBoost</span>{" "}
-                    <em className="text-muted-foreground">(Gradient-boosted decision trees)</em>
-                    <br />
-                    <span className="text-sm text-amber-300">
-                      Tuned Hyperparameters:&nbsp;
-                      <span className="text-muted-foreground">
-                        iterations, depth, learning_rate, l2_leaf_reg, random_strength, bagging_temperature, class_weights
-                      </span>
-                    </span>
-                  </>
-                }
+                          <>
+              <span className="font-semibold text-lg text-primary">LightGBM</span>{" "}
+              <em className="text-muted-foreground">(Light Gradient Boosting Machine)</em>
+              <br />
+              <span className="text-sm text-amber-300">
+                Tuned Hyperparameters:&nbsp;
+                <span className="text-muted-foreground">
+                  n_estimators, max_depth, learning_rate, num_leaves, min_child_samples, subsample, colsample_bytree
+                </span>
+              </span>
+            </>
+
+            }
             accuracy={
               <div>
                 <div className="text-5xl font-extrabold tracking-tight leading-none text-secondary [font-variant-numeric:tabular-nums]">
-                  79%
+                  92%
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2 text-xs">
                   <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
-                    Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.75</span>
+                    Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.89</span>
                   </span>
                   <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
-                    Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.77</span>
+                    Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.92</span>
                   </span>
                   <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
-                    Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.94</span>
+                    Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.981</span>
                   </span>
                   <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
-                    Weighted-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.94</span>
+                    Weighted-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.982</span>
                   </span>
                 </div>
               </div>
@@ -193,7 +201,7 @@ export default function ModelDescription() {
                 <br /><br />
                 • <strong>Accuracy:</strong> 77% on test data <br />
                 • <strong>Macro-F1:</strong> 65% (Weighted-F1: 76%) <br />
-                • <strong>Macro-AUC:</strong> 83.1% (Weighted-F1: 81.2%) <br />
+                • <strong>Class-wise F1 Scores:</strong> Confirmed (53%), Candidate (85%), False Positive (55%) <br />
                 <br />
                 <strong>Observation:</strong> The <strong>CANDIDATE</strong> class demonstrates high recall (91%) and F1 scores (85%), 
                 while <strong>CONFIRMED</strong> and <strong>FALSE POSITIVE</strong> samples are occasionally misclassified 
@@ -211,7 +219,7 @@ export default function ModelDescription() {
                 <span className="text-sm text-amber-300">
                   Tuned Hyperparameters:&nbsp;
                   <span className="text-muted-foreground">
-                    n_estimators, max_depth, num_leaves, min_child_samples, learning_rate, subsample, colsample_bytree
+                    n_estimators, learning_rate, max_depth, num_leaves, min_child_samples, min_child_weight, subsample, subsample_freq, colsample_bytree, reg_alpha, reg_lambda
                   </span>
                 </span>
               </>
@@ -259,32 +267,37 @@ export default function ModelDescription() {
         <div className="grid md:grid-cols-4 gap-6">
           <PipelineStep
             number={1}
-            title="Data Ingestion"
-            description="CSV upload with validation and format checking"
-            icon={<Database className="w-6 h-6" />}
-          />
-          <PipelineStep
-            number={2}
             title="Preprocessing"
-            description="Feature scaling, normalization, and missing value handling"
+            description="Median imputation for numeric features, one-hot encoding for categoricals, and standardization with a saved feature order."
             icon={<Zap className="w-6 h-6" />}
           />
+
+          <PipelineStep
+            number={2}
+            title="Hyperparameter Tuning"
+            description="Bayesian over LightGBM/Random Forest hyperparameters, optimized for F1/AUC with cross-validation and early stopping."
+            icon={<Database className="w-6 h-6" />}
+          />
+
           <PipelineStep
             number={3}
-            title="Model Inference"
-            description="Multi-model ensemble prediction with confidence scoring"
+            title="Model Training"
+            description="Fit the best configuration, handle class imbalance, validate on the hold-out set, and persist artifacts (model, encoder, scaler, medians)."
             icon={<Brain className="w-6 h-6" />}
           />
+
           <PipelineStep
             number={4}
-            title="Classification"
-            description="Final categorization: Confirmed, Candidate, or False Positive"
-            icon={<Target className="w-6 h-6" />}
+            title="Model Inference"
+            description="Apply the same preprocessing to uploaded CSVs, generate predictions and confidence scores, and surface top feature importances for transparency."
+            icon={<Brain className="w-6 h-6" />}
           />
+
+          
         </div>
       </div>
 
-      {/* Performance Metrics */}
+      {/* Performance Metrics
       <div className="grid md:grid-cols-3 gap-6">
         <MetricCard
           title="Overall Accuracy"
@@ -307,7 +320,99 @@ export default function ModelDescription() {
           icon={<Zap className="w-8 h-8" />}
           gradient="from-accent to-secondary"
         />
-      </div>
+      </div> */}
+
+      {/* Experiments & Results (colored) */}
+      <Card className="glass-card border-border/50 mb-12">
+        <CardHeader>
+          <h2 className="text-3xl font-bold mb-6 gradient-text flex items-center gap-3">
+          <LineChart className="w-8 h-8 text-primary" />
+          Experiments & Results Summary
+          </h2>
+          <CardDescription>Macro metrics per dataset/model</CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          {(() => {
+            type Row = {
+              dataset: string; model: string;
+              recall: number; precision: number; f1: number; auc: number; acc: number;
+            };
+
+            // Dummy numbers — swap with your real results
+            const rows: Row[] = [
+              { dataset: "Kepler", model: "Random Forest", recall: 0.82, precision: 0.84, f1: 0.83, auc: 0.94,  acc: 0.87 },
+              { dataset: "Kepler", model: "LightGBM",      recall: 0.85, precision: 0.82, f1: 0.83, auc: 0.96,  acc: 0.87 },
+              { dataset: "K2",     model: "Random Forest", recall: 0.85, precision: 0.88, f1: 0.86, auc: 0.97,  acc: 0.90 },
+              { dataset: "K2",     model: "LightGBM",      recall: 0.88, precision: 0.91, f1: 0.89, auc: 0.98,  acc: 0.92 },
+              { dataset: "TESS",   model: "Random Forest", recall: 0.68, precision: 0.58, f1: 0.62, auc: 0.80,  acc: 0.74 },
+              { dataset: "TESS",   model: "LightGBM",      recall: 0.71, precision: 0.61, f1: 0.65, auc: 0.83,  acc: 0.77 },
+            ];
+
+            const max = {
+              recall: Math.max(...rows.map(r => r.recall)),
+              precision: Math.max(...rows.map(r => r.precision)),
+              f1: Math.max(...rows.map(r => r.f1)),
+              auc: Math.max(...rows.map(r => r.auc)),
+              acc: Math.max(...rows.map(r => r.acc)),
+            };
+
+            const fmt = (v:number) => `${(v*100).toFixed(1)}%`;
+
+            const Chip = ({v, m}:{v:number; m:number}) => (
+              <span className={[
+                "px-2 py-1 rounded-full text-xs font-semibold border",
+                v === m
+                  ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
+                  : v >= 0.85
+                  ? "bg-primary/10 text-primary border-primary/30"
+                  : v >= 0.75
+                  ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
+                  : "bg-rose-500/10 text-rose-300 border-rose-500/30",
+              ].join(" ")}>
+                {fmt(v)}
+              </span>
+            );
+
+            return (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-white/[0.03]">
+                    <TableRow>
+                      <TableHead>Dataset</TableHead>
+                      <TableHead>Model</TableHead>
+                      <TableHead className="text-center">Macro Recall</TableHead>
+                      <TableHead className="text-center">Precision</TableHead>
+                      <TableHead className="text-center">F1</TableHead>
+                      <TableHead className="text-center">AUC</TableHead>
+                      <TableHead className="text-center">Accuracy</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {rows.map((r, i) => (
+                      <TableRow key={i} className="hover:bg-primary/5">
+                        <TableCell className="font-medium">{r.dataset}</TableCell>
+                        <TableCell className="text-foreground/90">{r.model}</TableCell>
+                        <TableCell className="text-center"><Chip v={r.recall}    m={max.recall} /></TableCell>
+                        <TableCell className="text-center"><Chip v={r.precision} m={max.precision} /></TableCell>
+                        <TableCell className="text-center"><Chip v={r.f1}        m={max.f1} /></TableCell>
+                        <TableCell className="text-center"><Chip v={r.auc}       m={max.auc} /></TableCell>
+                        <TableCell className="text-center"><Chip v={r.acc}       m={max.acc} /></TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            );
+          })()}
+        </CardContent>
+
+      </Card>
+
+
+      
+
+      
     </div>
   );
 }
