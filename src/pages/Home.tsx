@@ -18,7 +18,7 @@ export default function Home() {
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
           ExoQuest leverages advanced machine learning to analyze data from NASA's
-          space missions—Kepler, K2, and TESS—to automatically identify exoplanets
+          space missions like Kepler, K2, and TESS, to automatically identify exoplanets
           with unprecedented accuracy.
         </p>
         <Link to="/inference">
