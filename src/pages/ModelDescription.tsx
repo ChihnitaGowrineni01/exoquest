@@ -30,17 +30,78 @@ export default function ModelDescription() {
         <TabsContent value="kepler">
           <ModelCard
             mission="Kepler"
-            description="Trained on NASA's Kepler mission data (2009-2018), this model analyzes over 150,000 stars and identifies exoplanets using transit photometry."
-            algorithm="Random Forest Classifier with 500 estimators"
-            accuracy="96.8%"
+            description={
+            <span>
+              The <strong>Kepler Mission</strong>, launched by NASA in 2009, was designed to discover Earth-sized exoplanets orbiting other stars 
+              by monitoring over 150,000 stars for periodic dips in brightness (transits).
+              <br /><br />
+              The Kepler dataset includes planetary status labels such as  
+              <em> PC</em> (planetary candidate), <em>CP</em> (confirmed planet), and <em>FP</em> (false positive). 
+              These are standardized into three categories — 
+              <strong> Confirmed</strong>, <strong>Candidate</strong>, and <strong>False Positive</strong> — for model training.
+              <br /><br />
+              A <strong>LightGBM classifier</strong>, optimized with <strong>Bayesian hyperparameter tuning</strong> 
+              (via <em>BayesSearchCV</em>) on the <em>macro-F1 score</em>, achieved strong generalization performance:
+              <br /><br />
+              • <strong>Accuracy:</strong> 88% on test data <br />
+              • <strong>Macro-F1:</strong> 83% (Weighted-F1: 87%) <br />
+              • <strong>Macro-AUC:</strong> 96% (Weighted-AUC: 96.8%) <br />
+              <br />
+              <strong>Observation:</strong> The <strong>CANDIDATE</strong> class demonstrates moderate performance with a lower recall (59%) and F1-score (66%), 
+              indicating that many candidate planets are being misclassified as either <strong>CONFIRMED</strong> or <strong>FALSE POSITIVE</strong>. 
+              In contrast, both the <strong>CONFIRMED</strong> and <strong>FALSE POSITIVE</strong> classes show high precision (89–90%) and recall (95%), 
+              leading to strong F1-scores of 0.92 each. Overall accuracy is high at 88%, with macro and weighted F1-scores at 0.83 and 0.87 respectively. 
+              This suggests the model performs exceptionally well on confirmed and false positive classes, while still needing improvement in detecting candidate planets reliably.
+            </span>
+         }
+            algorithm={
+                          <>
+              <span className="font-semibold text-lg text-primary">LightGBM</span>{" "}
+              <em className="text-muted-foreground">(Light Gradient Boosting Machine)</em>
+              <br />
+              <span className="text-sm text-amber-300">
+                Tuned Hyperparameters:&nbsp;
+                <span className="text-muted-foreground">
+                  n_estimators, max_depth, learning_rate, num_leaves, min_child_samples, subsample, colsample_bytree
+                </span>
+              </span>
+            </>
+
+            }
+            accuracy={
+              <div>
+                  <div className="text-5xl font-extrabold tracking-tight leading-none text-secondary [font-variant-numeric:tabular-nums]">
+                    88%
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.83</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.81</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.96</span>
+                    </span>
+                    <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                      Weighted-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.97</span>
+                    </span>
+                  </div>
+                </div>
+
+            }
             features={[
-              "Orbital Period",
-              "Transit Duration",
-              "Transit Depth",
-              "Planetary Radius",
-              "Stellar Parameters",
-              "Signal-to-Noise Ratio"
-            ]}
+              "Orbital Period (koi_period)",
+              "Transit Duration (koi_duration)",
+              "Transit Depth (koi_depth)",
+              "Planet Radius (koi_prad)",
+              "Stellar Effective Temperature (koi_steff)",
+              "Stellar Surface Gravity (koi_slogg)",
+              "Stellar Radius (koi_srad)",
+              "Stellar Metallicity (koi_smet)",
+              "Signal-to-Noise Ratio (koi_model_snr)",
+              "Right Ascension, Declination, Kepler Magnitude (ra, dec, koi_kepmag)"
+]}
           />
         </TabsContent>
 
