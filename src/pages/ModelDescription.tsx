@@ -108,16 +108,69 @@ export default function ModelDescription() {
         <TabsContent value="k2">
           <ModelCard
             mission="K2"
-            description="Built on K2 mission data (2014-2018), leveraging the same spacecraft with optimized algorithms for the extended mission's different observation strategy."
-            algorithm="Gradient Boosting Classifier (XGBoost)"
-            accuracy="95.3%"
+            description={
+            <span>
+              The <strong>K2 Mission</strong>The K2 Mission (2014–2018), NASA’s extended phase of the Kepler mission, was launched to continue the search for exoplanets after Kepler’s partial hardware failure. By observing different regions along the ecliptic plane, K2 captured high-precision light curves of thousands of stars to detect periodic dips in brightness caused by transiting planets.Each detected signal was analyzed and categorized into one of three standardized classes—Confirmed, Candidate, or False Positive. 
+              <br /><br />
+              The K2 dataset includes planetary status labels such as  
+              <em> Confirmed, Candidate, False Positive, Refuted. </em>
+              These are standardized into three categories — 
+              <strong> Confirmed</strong>, <strong>Candidate</strong>, and <strong>False Positive</strong> — for model training.
+              <br /><br />
+              A <strong>CatBoost classifier</strong>, is used to achieve strong generalization performance:
+              <br /><br />
+              • <strong>Accuracy:</strong> 79.3%  on test data <br />
+              • <strong>Macro-F1:</strong> 75.5% (Weighted-F1: 77.4%) <br />
+              • <strong>Macro-AUC:</strong> 94.4% <br />
+              <br />
+              <strong>Observation:</strong> The <strong>CatBoost model</strong> demonstrates excellent overall classification performance, achieving high precision and balanced F1 scores across all categories. The <strong>CONFIRMED</strong> class shows particularly strong results with a recall of approximately <em>0.99</em>, indicating that nearly all true confirmed exoplanets are correctly identified. The <strong>CANDIDATE</strong> class maintains high recall with a slight drop due to occasional misclassifications as confirmed planets, an expected outcome given their astrophysical similarity and overlapping orbital or photometric patterns. The <strong>FALSE POSITIVE</strong> class exhibits high precision (~<em>0.91</em>), showing that the model rarely mistakes genuine planetary signals for spurious detections. Most confusion occurs between <strong>CANDIDATE</strong> and <strong>CONFIRMED</strong> categories, consistent with real mission behavior where many candidates later become validated planets. Misclassification between <strong>CONFIRMED</strong> and <strong>FALSE POSITIVE</strong> cases remains minimal (1–2%), highlighting the model’s strong ability to distinguish true exoplanet signals from noise or instrumental artifacts.
+            </span>
+         }
+            algorithm={
+                  <>
+                    <span className="font-semibold text-lg text-primary">CatBoost</span>{" "}
+                    <em className="text-muted-foreground">(Gradient-boosted decision trees)</em>
+                    <br />
+                    <span className="text-sm text-amber-300">
+                      Tuned Hyperparameters:&nbsp;
+                      <span className="text-muted-foreground">
+                        iterations, depth, learning_rate, l2_leaf_reg, random_strength, bagging_temperature, class_weights
+                      </span>
+                    </span>
+                  </>
+                }
+            accuracy={
+              <div>
+                <div className="text-5xl font-extrabold tracking-tight leading-none text-secondary [font-variant-numeric:tabular-nums]">
+                  79%
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                  <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                    Macro-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.75</span>
+                  </span>
+                  <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                    Weighted-F1 <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.77</span>
+                  </span>
+                  <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                    Macro-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.94</span>
+                  </span>
+                  <span className="px-2 py-1 rounded-full bg-secondary/15 border border-secondary/30">
+                    Weighted-AUC <span className="font-semibold text-secondary-foreground text-white">&nbsp;0.94</span>
+                  </span>
+                </div>
+              </div>
+            }
             features={[
-              "Transit Time",
-              "Impact Parameter",
-              "Stellar Magnitude",
-              "Planetary Temperature",
-              "Eccentricity",
-              "Semi-major Axis"
+              "Transit Depth (pl_trandep)",
+              "Orbital Period (pl_orbper)",
+              "Parallax / Distance (sy_plx / sy_dist)",
+              "Stellar Proper Motion (sy_pm / sy_pmra / sy_pmdec)",
+              "Planet–Star Radius Ratio (pl_ratror / pl_ratdor)",
+              "Transit Duration (pl_trandur)",
+              "Planet Radius (pl_rade / pl_radj)",
+              "Ecliptic / Galactic Position (elat, glat / elon, glon)",
+              "Stellar Magnitudes (sy_w3mag, sy_w4mag)",
+              "Kepler/ K2 observation counts (k2_campaigns_num, st_nphot)"
             ]}
           />
         </TabsContent>
