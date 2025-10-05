@@ -78,7 +78,7 @@ class ExoplanetModel:
             for col in self.log_features:
                 X.loc[:, col] = np.log1p(X.loc[:, col])
 
-            X = self.scaler.transform(X)           
+            X = self.scaler.transform(X.values)           
 
 
         else:
