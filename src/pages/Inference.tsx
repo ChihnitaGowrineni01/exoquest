@@ -8,6 +8,8 @@ import { Upload, Sparkles, Info, CheckCircle, AlertCircle, GitCompare  } from "l
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { FEATURE_MAP, FEATURE_ORDER, type ModelKey } from "@/lib/featureMaps";
+
 
 export default function Inference() {
   const [selectedModel, setSelectedModel] = useState<string>("");
@@ -15,6 +17,15 @@ export default function Inference() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
+
+  const modelKey = (selectedModel || 'kepler') as ModelKey; // or show nothing until chosen
+  const spec = FEATURE_MAP[selectedModel as ModelKey];
+  const ordered = spec
+    ? (FEATURE_ORDER[modelKey].length
+        ? FEATURE_ORDER[modelKey].map(k => [k, spec[k]])
+        : Object.entries(spec))
+    : [];
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -104,7 +115,7 @@ export default function Inference() {
               <SelectContent className="glass-card border-border/50">
                 <SelectItem value="kepler">Kepler Mission (96.8% accuracy)</SelectItem>
                 <SelectItem value="k2">K2 Mission (95.3% accuracy)</SelectItem>
-                <SelectItem value="tess">TESS Mission (97.2% accuracy)</SelectItem>
+                <SelectItem value="tess">TESS Mission (77% accuracy)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -175,46 +186,32 @@ export default function Inference() {
                   Expected Columns
                 </Button>
               </DialogTrigger>
-              <DialogContent className="glass-card border-border/50 max-w-2xl">
+              
+              <DialogContent className="glass-card border-border/50 max-w-2xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="gradient-text">Required Dataset Columns</DialogTitle>
                   <DialogDescription>
-                    Your CSV file should include the following columns for optimal results
+                    {selectedModel
+                      ? <>Columns expected for the <b>{selectedModel.toUpperCase()}</b> model.</>
+                      : 'Pick a model to see its required columns.'}
                   </DialogDescription>
                 </DialogHeader>
+
+                {/* Scrollable section */}
                 <div className="space-y-4 mt-4">
-                  <DatasetColumn
-                    name="koi_period"
-                    description="Orbital period in days - the time it takes for the planet to complete one orbit"
-                    type="float"
-                  />
-                  <DatasetColumn
-                    name="koi_duration"
-                    description="Transit duration in hours - how long the planet blocks the star's light"
-                    type="float"
-                  />
-                  <DatasetColumn
-                    name="koi_depth"
-                    description="Transit depth in parts per million (ppm) - the amount of light blocked"
-                    type="float"
-                  />
-                  <DatasetColumn
-                    name="koi_prad"
-                    description="Planetary radius in Earth radii - the size of the planet"
-                    type="float"
-                  />
-                  <DatasetColumn
-                    name="koi_teq"
-                    description="Equilibrium temperature in Kelvin - the planet's estimated surface temperature"
-                    type="float"
-                  />
-                  <DatasetColumn
-                    name="koi_insol"
-                    description="Insolation flux in Earth flux - the amount of stellar energy received"
-                    type="float"
-                  />
+                  {!selectedModel && <p className="text-muted-foreground">No model selected.</p>}
+                  {selectedModel && ordered.map(([name, info]) => (
+                    <DatasetColumn
+                      key={name as string}
+                      name={name as string}
+                      description={(info as any).description}
+                      type={(info as any).type}
+                    />
+                  ))}
                 </div>
               </DialogContent>
+
+
             </Dialog>
           </div>
         </CardContent>
