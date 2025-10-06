@@ -13,11 +13,19 @@ import { LabelList } from "recharts";
 export default function ModelDescription() {
   return (
     <div className="container mx-auto px-6 py-12">
-      <div className="text-center mb-12 animate-fade-in">
-        <h1 className="text-5xl font-bold mb-4 gradient-text">Why Our AI?</h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Explore the cutting-edge machine learning models powering ExoQuest's exoplanet detection capabilities.
+      <div className="text-center mb-16 animate-fade-in space-y-4">
+        <h1 className="text-5xl md:text-6xl font-bold gradient-text tracking-tight drop-shadow-sm">
+          Why Our AI?
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          We are a transparent, data-driven, and easy-to-use platform — ensuring precision, reliability, and trust in every discovery.
         </p>
+
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Explore the cutting-edge machine learning models powering ExoQuest’s exoplanet detection capabilities.
+        </p>
+
+        <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full mx-auto mt-6 opacity-80"></div>
       </div>
 
       {/* Model Pipeline */}
