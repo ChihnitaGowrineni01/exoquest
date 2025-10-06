@@ -381,7 +381,7 @@ export default function ModelDescription() {
                     <TableRow>
                       <TableHead>Dataset</TableHead>
                       <TableHead>Model</TableHead>
-                      <TableHead className="text-center">Macro Recall</TableHead>
+                      <TableHead className="text-center">Recall</TableHead>
                       <TableHead className="text-center">Precision</TableHead>
                       <TableHead className="text-center">F1</TableHead>
                       <TableHead className="text-center">AUC</TableHead>
