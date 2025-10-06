@@ -16,6 +16,10 @@ export default function Home() {
         <h1 className="text-6xl font-bold mb-6 gradient-text">
           Discover Exoplanets with AI
         </h1>
+
+        <h2 className="text-3xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+          We are on a journey to accelerate exoplanet discovery for astronomers and researchers.
+        </h2>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
           ExoQuest leverages advanced machine learning to analyze data from NASA's
           space missions—Kepler, K2, and TESS—to automatically identify exoplanets
