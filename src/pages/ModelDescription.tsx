@@ -3,19 +3,101 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, Layers, Zap, Target, Database, TrendingUp, LineChart  } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useState } from "react";
+import { Switch } from "@/components/ui/switch";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LabelList } from "recharts";
+
 
 
 export default function ModelDescription() {
   return (
     <div className="container mx-auto px-6 py-12">
-      <div className="text-center mb-12 animate-fade-in">
-        <h1 className="text-5xl font-bold mb-4 gradient-text">AI Model Architecture</h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Explore the cutting-edge machine learning models powering ExoQuest's exoplanet detection capabilities.
+      <div className="text-center mb-16 animate-fade-in space-y-4">
+        <h1 className="text-5xl md:text-6xl font-bold gradient-text tracking-tight drop-shadow-sm">
+          Why Our AI?
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          We are a transparent, data-driven, and easy-to-use platform — ensuring precision, reliability, and trust in every discovery.
         </p>
+
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Explore the cutting-edge machine learning models powering ExoQuest’s exoplanet detection capabilities.
+        </p>
+
+        <div className="w-24 h-1 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full mx-auto mt-6 opacity-80"></div>
       </div>
 
+      {/* Model Pipeline */}
+      <div className="glass-card rounded-2xl p-8 mb-12">
+        <h2 className="text-3xl font-bold mb-6 gradient-text flex items-center gap-3">
+          <Layers className="w-8 h-8 text-primary" />
+          Our Approach
+        </h2>
+        <div className="grid md:grid-cols-4 gap-6">
+          <PipelineStep
+            number={1}
+            title="Preprocessing"
+            description="Median imputation for numeric features, one-hot encoding for categoricals, and standardization with a saved feature order."
+            icon={<Zap className="w-9 h-9 mt-3 text-primary" />}
+          />
+
+          <PipelineStep
+            number={2}
+            title="Hyperparameter Tuning"
+            description="Bayesian over LightGBM/Random Forest hyperparameters, optimized for F1/AUC with cross-validation and early stopping."
+            icon={<Database className="w-9 h-9 mt-3 text-primary" />}
+          />
+
+          <PipelineStep
+            number={3}
+            title="Model Training"
+            description="Fit the best configuration, handle class imbalance, validate on the hold-out set, and persist artifacts (model, encoder, scaler, medians)."
+            icon={<Brain className="w-9 h-9 mt-3 text-primary" />}
+          />
+
+          <PipelineStep
+            number={4}
+            title="Model Inference"
+            description="Apply the same preprocessing to uploaded CSVs, generate predictions and confidence scores, and surface top feature importances for transparency."
+            icon={<Brain className="w-9 h-9 mt-3 text-primary" />}
+          />
+
+          
+        </div>
+      </div>
+
+      {/* Performance Metrics
+      <div className="grid md:grid-cols-3 gap-6">
+        <MetricCard
+          title="Overall Accuracy"
+          value="96.4%"
+          description="Across all three mission datasets"
+          icon={<TrendingUp className="w-8 h-8" />}
+          gradient="from-primary to-accent"
+        />
+        <MetricCard
+          title="False Positive Rate"
+          value="2.1%"
+          description="Minimized through ensemble methods"
+          icon={<Target className="w-8 h-8" />}
+          gradient="from-secondary to-primary"
+        />
+        <MetricCard
+          title="Processing Speed"
+          value="< 3s"
+          description="Average inference time per dataset"
+          icon={<Zap className="w-8 h-8" />}
+          gradient="from-accent to-secondary"
+        />
+      </div> */}
+
+      {/* Experiments & Results (colored) */}
+      <ExperimentsAndVisualsCard />
+
       {/* Model Tabs */}
+
+      
       <Tabs defaultValue="kepler" className="mb-12">
         <TabsList className="grid w-full grid-cols-3 glass-card">
           <TabsTrigger value="kepler" className="data-[state=active]:gradient-cosmic">
@@ -29,7 +111,7 @@ export default function ModelDescription() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="kepler">
+        <TabsContent value="kepler" className="-mt-5">
           <ModelCard
             mission="Kepler"
             description={
@@ -107,7 +189,7 @@ export default function ModelDescription() {
           />
         </TabsContent>
 
-        <TabsContent value="k2">
+        <TabsContent value="k2" className="-mt-5">
           <ModelCard
             mission="K2"
             description={
@@ -183,7 +265,7 @@ export default function ModelDescription() {
           />
         </TabsContent>
 
-        <TabsContent value="tess">
+        <TabsContent value="tess" className="-mt-5">
           <ModelCard
             mission="TESS"
             description={
@@ -256,163 +338,7 @@ export default function ModelDescription() {
 
           />
         </TabsContent>
-      </Tabs>
-
-      {/* Model Pipeline */}
-      <div className="glass-card rounded-2xl p-8 mb-12">
-        <h2 className="text-3xl font-bold mb-6 gradient-text flex items-center gap-3">
-          <Layers className="w-8 h-8 text-primary" />
-          Model Pipeline
-        </h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          <PipelineStep
-            number={1}
-            title="Preprocessing"
-            description="Median imputation for numeric features, one-hot encoding for categoricals, and standardization with a saved feature order."
-            icon={<Zap className="w-6 h-6" />}
-          />
-
-          <PipelineStep
-            number={2}
-            title="Hyperparameter Tuning"
-            description="Bayesian over LightGBM/Random Forest hyperparameters, optimized for F1/AUC with cross-validation and early stopping."
-            icon={<Database className="w-6 h-6" />}
-          />
-
-          <PipelineStep
-            number={3}
-            title="Model Training"
-            description="Fit the best configuration, handle class imbalance, validate on the hold-out set, and persist artifacts (model, encoder, scaler, medians)."
-            icon={<Brain className="w-6 h-6" />}
-          />
-
-          <PipelineStep
-            number={4}
-            title="Model Inference"
-            description="Apply the same preprocessing to uploaded CSVs, generate predictions and confidence scores, and surface top feature importances for transparency."
-            icon={<Brain className="w-6 h-6" />}
-          />
-
-          
-        </div>
-      </div>
-
-      {/* Performance Metrics
-      <div className="grid md:grid-cols-3 gap-6">
-        <MetricCard
-          title="Overall Accuracy"
-          value="96.4%"
-          description="Across all three mission datasets"
-          icon={<TrendingUp className="w-8 h-8" />}
-          gradient="from-primary to-accent"
-        />
-        <MetricCard
-          title="False Positive Rate"
-          value="2.1%"
-          description="Minimized through ensemble methods"
-          icon={<Target className="w-8 h-8" />}
-          gradient="from-secondary to-primary"
-        />
-        <MetricCard
-          title="Processing Speed"
-          value="< 3s"
-          description="Average inference time per dataset"
-          icon={<Zap className="w-8 h-8" />}
-          gradient="from-accent to-secondary"
-        />
-      </div> */}
-
-      {/* Experiments & Results (colored) */}
-      <Card className="glass-card border-border/50 mb-12">
-        <CardHeader>
-          <h2 className="text-3xl font-bold mb-6 gradient-text flex items-center gap-3">
-          <LineChart className="w-8 h-8 text-primary" />
-          Experiments & Results Summary
-          </h2>
-          <CardDescription>Macro metrics per dataset/model</CardDescription>
-        </CardHeader>
-
-        <CardContent>
-          {(() => {
-            type Row = {
-              dataset: string; model: string;
-              recall: number; precision: number; f1: number; auc: number; acc: number;
-            };
-
-            // Dummy numbers — swap with your real results
-            const rows: Row[] = [
-              { dataset: "Kepler", model: "Random Forest", recall: 0.82, precision: 0.84, f1: 0.83, auc: 0.94,  acc: 0.87 },
-              { dataset: "Kepler", model: "LightGBM",      recall: 0.85, precision: 0.82, f1: 0.83, auc: 0.96,  acc: 0.87 },
-              { dataset: "K2",     model: "Random Forest", recall: 0.85, precision: 0.88, f1: 0.86, auc: 0.97,  acc: 0.90 },
-              { dataset: "K2",     model: "LightGBM",      recall: 0.88, precision: 0.91, f1: 0.89, auc: 0.98,  acc: 0.92 },
-              { dataset: "TESS",   model: "Random Forest", recall: 0.68, precision: 0.58, f1: 0.62, auc: 0.80,  acc: 0.74 },
-              { dataset: "TESS",   model: "LightGBM",      recall: 0.71, precision: 0.61, f1: 0.65, auc: 0.83,  acc: 0.77 },
-            ];
-
-            const max = {
-              recall: Math.max(...rows.map(r => r.recall)),
-              precision: Math.max(...rows.map(r => r.precision)),
-              f1: Math.max(...rows.map(r => r.f1)),
-              auc: Math.max(...rows.map(r => r.auc)),
-              acc: Math.max(...rows.map(r => r.acc)),
-            };
-
-            const fmt = (v:number) => `${(v*100).toFixed(1)}%`;
-
-            const Chip = ({v, m}:{v:number; m:number}) => (
-              <span className={[
-                "px-2 py-1 rounded-full text-xs font-semibold border",
-                v === m
-                  ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
-                  : v >= 0.85
-                  ? "bg-primary/10 text-primary border-primary/30"
-                  : v >= 0.75
-                  ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
-                  : "bg-rose-500/10 text-rose-300 border-rose-500/30",
-              ].join(" ")}>
-                {fmt(v)}
-              </span>
-            );
-
-            return (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader className="bg-white/[0.03]">
-                    <TableRow>
-                      <TableHead>Dataset</TableHead>
-                      <TableHead>Model</TableHead>
-                      <TableHead className="text-center">Recall</TableHead>
-                      <TableHead className="text-center">Precision</TableHead>
-                      <TableHead className="text-center">F1</TableHead>
-                      <TableHead className="text-center">AUC</TableHead>
-                      <TableHead className="text-center">Accuracy</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {rows.map((r, i) => (
-                      <TableRow key={i} className="hover:bg-primary/5">
-                        <TableCell className="font-medium">{r.dataset}</TableCell>
-                        <TableCell className="text-foreground/90">{r.model}</TableCell>
-                        <TableCell className="text-center"><Chip v={r.recall}    m={max.recall} /></TableCell>
-                        <TableCell className="text-center"><Chip v={r.precision} m={max.precision} /></TableCell>
-                        <TableCell className="text-center"><Chip v={r.f1}        m={max.f1} /></TableCell>
-                        <TableCell className="text-center"><Chip v={r.auc}       m={max.auc} /></TableCell>
-                        <TableCell className="text-center"><Chip v={r.acc}       m={max.acc} /></TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            );
-          })()}
-        </CardContent>
-
-      </Card>
-
-
-      
-
-      
+      </Tabs>  
     </div>
   );
 }
@@ -519,3 +445,144 @@ function MetricCard({
     </Card>
   );
 }
+
+function ExperimentsAndVisualsCard() {
+  const [showVisuals, setShowVisuals] = useState(true);
+
+  type Row = {
+    dataset: "Kepler" | "K2" | "TESS";
+    model: "Random Forest" | "LightGBM";
+    recall: number; precision: number; f1: number; auc: number; acc: number;
+  };
+
+  const rows: Row[] = [
+    { dataset: "Kepler", model: "Random Forest", recall: 0.82, precision: 0.84, f1: 0.83, auc: 0.94,  acc: 0.87 },
+    { dataset: "Kepler", model: "LightGBM",      recall: 0.85, precision: 0.82, f1: 0.83, auc: 0.96,  acc: 0.87 },
+    { dataset: "K2",     model: "Random Forest", recall: 0.85, precision: 0.88, f1: 0.86, auc: 0.97,  acc: 0.90 },
+    { dataset: "K2",     model: "LightGBM",      recall: 0.88, precision: 0.91, f1: 0.89, auc: 0.98,  acc: 0.92 },
+    { dataset: "TESS",   model: "Random Forest", recall: 0.68, precision: 0.58, f1: 0.62, auc: 0.80,  acc: 0.74 },
+    { dataset: "TESS",   model: "LightGBM",      recall: 0.71, precision: 0.61, f1: 0.65, auc: 0.83,  acc: 0.77 },
+  ];
+
+  const max = {
+    recall: Math.max(...rows.map(r => r.recall)),
+    precision: Math.max(...rows.map(r => r.precision)),
+    f1: Math.max(...rows.map(r => r.f1)),
+    auc: Math.max(...rows.map(r => r.auc)),
+    acc: Math.max(...rows.map(r => r.acc)),
+  };
+
+  const fmt = (v:number) => `${(v*100).toFixed(1)}%`;
+
+  const Chip = ({v, m}:{v:number; m:number}) => (
+    <span className={[
+      "px-2 py-1 rounded-full text-xs font-semibold border",
+      v === m
+        ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
+        : v >= 0.85
+        ? "bg-primary/10 text-primary border-primary/30"
+        : v >= 0.75
+        ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
+        : "bg-rose-500/10 text-rose-300 border-rose-500/30",
+    ].join(" ")}>
+      {fmt(v)}
+    </span>
+  );
+
+  // ---- chart helpers ----
+  const toChart = (dataset: Row["dataset"]) => {
+    const rf = rows.find(r => r.dataset === dataset && r.model === "Random Forest")!;
+    const lg = rows.find(r => r.dataset === dataset && r.model === "LightGBM")!;
+    return [
+      { metric: "Recall",    "Random Forest": Math.round(rf.recall*100),    "LightGBM": Math.round(lg.recall*100) },
+      { metric: "Precision", "Random Forest": Math.round(rf.precision*100), "LightGBM": Math.round(lg.precision*100) },
+      { metric: "F1",        "Random Forest": Math.round(rf.f1*100),        "LightGBM": Math.round(lg.f1*100) },
+    ];
+  };
+
+  const ChartBlock = ({ dataset }:{ dataset: Row["dataset"] }) => (
+    <div className="rounded-xl bg-white/[0.03] border border-white/10 p-4">
+      <p className="mb-3 font-semibold">{dataset}</p>
+      <div className="h-72 w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={toChart(dataset)}
+            barCategoryGap={24}
+            margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+          >
+            <XAxis dataKey="metric" />
+            <YAxis domain={[0, 100]} tickFormatter={(v)=>`${v}%`} />
+            <Tooltip formatter={(v:number)=>`${v}%`} />
+            <Legend />
+            {/* use theme colors so bars aren’t black on dark mode */}
+            <Bar dataKey="Random Forest" radius={[8,8,0,0]} fill="hsl(var(--primary))" />
+            <Bar dataKey="LightGBM"     radius={[8,8,0,0]} fill="hsl(var(--secondary))" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+
+  return (
+    <Card className="glass-card border-border/50 mb-12">
+      <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-3xl font-bold mb-1 gradient-text flex items-center gap-3">
+            <LineChart className="w-8 h-8 text-primary" />
+            Our Performance Summary
+          </h2>
+          <CardDescription>Switch between table and charts for the same metrics.</CardDescription>
+        </div>
+
+        {/* Simple, intuitive switch */}
+        <div className="flex items-center gap-3">
+          <span className="text-m text-bold">Plots</span>
+          <Switch checked={showVisuals} onCheckedChange={setShowVisuals} />
+        </div>
+      </CardHeader>
+
+      <CardContent className="pt-0">
+        {showVisuals ? (
+          // ---------- CHARTS VIEW ----------
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <ChartBlock dataset="Kepler" />
+            <ChartBlock dataset="K2" />
+            <ChartBlock dataset="TESS" />
+          </div>
+        ) : (
+          // ---------- TABLE VIEW ----------
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader className="bg-white/[0.03]">
+                <TableRow>
+                  <TableHead>Dataset</TableHead>
+                  <TableHead>Model</TableHead>
+                  <TableHead className="text-center">Recall</TableHead>
+                  <TableHead className="text-center">Precision</TableHead>
+                  <TableHead className="text-center">F1</TableHead>
+                  <TableHead className="text-center">AUC</TableHead>
+                  <TableHead className="text-center">Accuracy</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((r, i) => (
+                  <TableRow key={i} className="hover:bg-primary/5">
+                    <TableCell className="font-medium">{r.dataset}</TableCell>
+                    <TableCell className="text-foreground/90">{r.model}</TableCell>
+                    <TableCell className="text-center"><Chip v={r.recall}    m={max.recall} /></TableCell>
+                    <TableCell className="text-center"><Chip v={r.precision} m={max.precision} /></TableCell>
+                    <TableCell className="text-center"><Chip v={r.f1}        m={max.f1} /></TableCell>
+                    <TableCell className="text-center"><Chip v={r.auc}       m={max.auc} /></TableCell>
+                    <TableCell className="text-center"><Chip v={r.acc}       m={max.acc} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+
