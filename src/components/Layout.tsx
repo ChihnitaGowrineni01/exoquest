@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Moon, Sun, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
@@ -78,6 +79,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main Content */}
       <main className="pt-20 relative z-10">{children}</main>
+      <SiteFooter />
     </div>
   );
 };
