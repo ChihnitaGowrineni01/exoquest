@@ -1,22 +1,12 @@
-# Welcome to our Lovable project
+# Welcome to our exoquest project
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/879ed86c-b100-468c-921e-5f3a7eb5cbbb
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/879ed86c-b100-468c-921e-5f3a7eb5cbbb) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+**URL**: https://exoquest.netlify.app/
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -59,15 +49,4 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/879ed86c-b100-468c-921e-5f3a7eb5cbbb) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- Python flask
