@@ -18,13 +18,12 @@ export default function Inference() {
   const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
 
-  const modelKey = (selectedModel || 'kepler') as ModelKey; // or show nothing until chosen
-  const spec = FEATURE_MAP[selectedModel as ModelKey];
-  const ordered = spec
-    ? (FEATURE_ORDER[modelKey].length
-        ? FEATURE_ORDER[modelKey].map(k => [k, spec[k]])
-        : Object.entries(spec))
-    : [];
+  const modelKey = (selectedModel as ModelKey) || 'kepler';
+  const spec = FEATURE_MAP[modelKey];
+  const ordered =
+    FEATURE_ORDER[modelKey]?.length && FEATURE_MAP[modelKey]
+      ? FEATURE_ORDER[modelKey].map(k => [k, FEATURE_MAP[modelKey][k]])
+      : Object.entries(FEATURE_MAP[modelKey] || {});
 
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
