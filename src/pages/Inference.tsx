@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { FEATURE_MAP, FEATURE_ORDER, type ModelKey } from "@/lib/featureMaps";
+import { FileDown, FileJson } from "lucide-react";
+
 
 
 export default function Inference() {
@@ -83,6 +85,54 @@ export default function Inference() {
       setIsLoading(false);
     }
   };
+
+  // Convert results[] → CSV string
+const resultsToCSV = (rows: any[]) => {
+  if (!rows.length) return "";
+  const keys = getOrderedKeys(rows);
+  const header = keys.join(",");
+  const lines = rows.map(r =>
+    keys.map(k => {
+      let v = r[k];
+      if (k === "Porbability Score") v = `${Number(v).toFixed(2)}%`;
+      else if (typeof v === "number") v = Number(v).toFixed(2);
+      return `"${v}"`;
+    }).join(",")
+  );
+  return [header, ...lines].join("\n");
+};
+
+// Helper to trigger file download
+const downloadText = (filename: string, text: string, mime = "text/csv") => {
+  const blob = new Blob([text], { type: mime });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+};
+
+const handleDownloadCSV = () => {
+  if (!results.length) return;
+  const csv = resultsToCSV(results);
+  downloadText("exoquest_predictions.csv", csv, "text/csv;charset=utf-8;");
+};
+
+const handleDownloadJSON = () => {
+  if (!results.length) return;
+  const json = JSON.stringify(results, null, 2);
+  downloadText("exoquest_predictions.json", json, "application/json;charset=utf-8;");
+};
+
+const getOrderedKeys = (rows: any[]) => {
+  if (!rows.length) return [];
+  const base = ["star_id", "classification", "Porbability Score"];
+  const rest = Object.keys(rows[0]).filter(
+    (k) => !base.includes(k) && k !== "id"
+  );
+  return [...base, ...rest];
+};
+
 
   return (
     <div className="container mx-auto px-6 py-12">
@@ -227,6 +277,15 @@ export default function Inference() {
                 <CardDescription>
                   AI-powered classification of {results.length} observations
                 </CardDescription>
+                <div className="flex gap-2 mt-2 justify-end ml-auto">
+                  <Button variant="outline" size="sm" onClick={handleDownloadCSV}>
+                    <FileDown className="w-4 h-4 mr-2" /> Download CSV
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={handleDownloadJSON}>
+                    <FileJson className="w-4 h-4 mr-2" /> JSON
+                  </Button>
+                </div>
+
               </CardHeader>
 
               <CardContent>
