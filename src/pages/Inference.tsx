@@ -10,6 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { FEATURE_MAP, FEATURE_ORDER, type ModelKey } from "@/lib/featureMaps";
 import { FileDown, FileJson } from "lucide-react";
+import { useMemo, useEffect } from "react";
+import {
+  ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
+} from "recharts";
+
 
 
 
@@ -19,6 +25,16 @@ export default function Inference() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
+
+// Features user can choose to visualize (supports common aliases + spaced headers)
+const FEATURE_CHOICES = [
+  { label: "Planet Orbital Period", keys: ["Planet Orbital Period", "planet_orbital_period", "pl_orbper", "orbital_period"] },
+  { label: "Planet Radius",         keys: ["Planet Radius", "planet_radius", "pl_rade", "radius"] },
+  { label: "Transit Duration",      keys: ["Transit Duration", "transit_duration", "pl_trandurh", "transit_dur", "duration_hours"] },
+];
+
+  const [metricKey, setMetricKey] = useState<string>("");
+
 
   const modelKey = (selectedModel || 'kepler') as ModelKey; // or show nothing until chosen
   const spec = FEATURE_MAP[selectedModel as ModelKey];
@@ -132,6 +148,78 @@ const getOrderedKeys = (rows: any[]) => {
   );
   return [...base, ...rest];
 };
+
+// ---- Charts data helpers ----
+const CLASS_COLORS: Record<string, string> = {
+  "CONFIRMED": "#22c55e",       // green
+  "CANDIDATE": "#f59e0b",       // amber-yellow
+  "FALSE POSITIVE": "#ef4444",  // red
+  "UNKNOWN": "#a3a3a3"          // gray
+};
+// ----- chart data (safe useMemo at top level) -----
+const pieData = useMemo(() => {
+  if (!results?.length) return [];
+  const counts: Record<string, number> = {};
+  for (const r of results) {
+    const cls = String(r.classification || "UNKNOWN").toUpperCase();
+    counts[cls] = (counts[cls] || 0) + 1;
+  }
+  return Object.entries(counts).map(([name, value]) => ({ name, value }));
+}, [results]);
+
+const barData = useMemo(() => {
+  if (!results?.length || !metricKey) return [] as { classification: string; value: number }[];
+  const groups: Record<string, number[]> = {};
+  for (const r of results) {
+    const cls = String(r.classification || "UNKNOWN").toUpperCase();
+    const v = Number(r[metricKey]);
+    if (Number.isFinite(v)) (groups[cls] ||= []).push(v);
+  }
+  return Object.entries(groups).map(([classification, arr]) => ({
+    classification,
+    value: arr.reduce((a, b) => a + b, 0) / arr.length,
+  }));
+}, [results, metricKey]);
+
+
+// ---- visual styles for charts ----
+const TICK_COLOR = "#94a3b8"; // tailwind slate-400
+const LEGEND_STYLE = { color: "#cbd5e1", fontSize: 12 }; // slate-300
+
+const getGradId = (name: string) => `grad-${name.replace(/\s/g, "-").toLowerCase()}`;
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  const p = payload[0];
+  return (
+    <div className="glass-card border border-border/50 px-3 py-2 rounded-lg shadow-md">
+      <div className="text-xs text-muted-foreground">{label || p.name}</div>
+      <div className="text-sm font-semibold" style={{ color: p.color || "white" }}>
+        {p.name || p.dataKey}: {Number(p.value).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+      </div>
+    </div>
+  );
+};
+
+const featureOptions = useMemo(() => {
+  if (!results?.length) return [];
+  const cols = Object.keys(results[0]);
+
+  // map lowercased -> original so we can return the exact key that exists
+  const colsMap = new Map(cols.map(c => [c.toLowerCase(), c]));
+
+  return FEATURE_CHOICES.flatMap(opt => {
+    const found = opt.keys
+      .map(k => colsMap.get(k.toLowerCase()))
+      .find(Boolean);
+    return found ? [{ label: opt.label, key: found as string }] : [];
+  });
+}, [results]);
+
+
+useEffect(() => {
+  if (featureOptions.length && !metricKey) setMetricKey(featureOptions[0].key);
+}, [featureOptions, metricKey]);
 
 
   return (
@@ -266,6 +354,115 @@ const getOrderedKeys = (rows: any[]) => {
           </div>
         </CardContent>
       </Card>
+{/* Charts: pie + bar side by side (blended styling) */}
+{results.length > 0 && (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-14 mb-10">
+    {/* PIE — donut with soft stroke + legend */}
+    <div className="glass-card border-border/50 rounded-xl p-4 shadow-lg backdrop-blur-md bg-gradient-to-b from-background/70 to-background/40">
+      <h3 className="text-lg font-semibold mb-3">Prediction Proportions</h3>
+
+      <ResponsiveContainer width="100%" height={260}>
+        <PieChart>
+          {/* gradients for nicer depth */}
+          <defs>
+            {pieData.map(d => (
+              <linearGradient id={getGradId(d.name)} key={d.name} x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor={CLASS_COLORS[d.name] || CLASS_COLORS["UNKNOWN"]} stopOpacity="0.7" />
+                <stop offset="100%" stopColor={CLASS_COLORS[d.name] || CLASS_COLORS["UNKNOWN"]} stopOpacity="1" />
+              </linearGradient>
+            ))}
+          </defs>
+
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={68}
+            outerRadius={104}
+            startAngle={90}
+            endAngle={450}
+            paddingAngle={2}
+            cornerRadius={6}
+            stroke="#0f172a80"     // slate-900/50 ring
+            strokeWidth={2}
+            isAnimationActive
+            animationDuration={600}
+          >
+            {pieData.map((entry, idx) => (
+              <Cell key={`slice-${idx}`} fill={`url(#${getGradId(entry.name)})`} />
+            ))}
+          </Pie>
+
+          <Tooltip content={<CustomTooltip />} />
+          <Legend iconType="circle" wrapperStyle={LEGEND_STYLE} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+
+    {/* BAR — rounded bars, selectable metric */}
+<div className="glass-card border-border/50 rounded-xl p-4">
+  <div className="flex items-start justify-between gap-3">
+    <div>
+      <h3 className="text-lg font-semibold">
+        Average {metricKey ? metricKey.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "Metric"} by Class
+      </h3>
+      <p className="text-sm text-muted-foreground">
+        Pick a feature to summarize by classification.
+      </p>
+    </div>
+
+    {/* Feature selector */}
+    <div className="min-w-[220px]">
+      <Select value={metricKey} onValueChange={setMetricKey}>
+        <SelectTrigger className="glass-card border-border/50 h-9">
+          <SelectValue placeholder="Choose a feature…" />
+        </SelectTrigger>
+        <SelectContent className="glass-card border-border/50">
+          {featureOptions.map(opt => (
+            <SelectItem key={opt.key} value={opt.key}>{opt.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  </div>
+
+  <ResponsiveContainer width="100%" height={260}>
+    <BarChart data={(() => {
+      if (!results?.length || !metricKey) return [];
+      const groups: Record<string, number[]> = {};
+      for (const r of results) {
+        const cls = String(r.classification || "UNKNOWN").toUpperCase();
+        const v = Number(r[metricKey]);
+        if (Number.isFinite(v)) (groups[cls] ||= []).push(v);
+      }
+      return Object.entries(groups).map(([classification, arr]) => ({
+        classification,
+        value: arr.reduce((a, b) => a + b, 0) / arr.length,
+      }));
+    })()} barSize={36}>
+      <XAxis dataKey="classification" tick={{ fill: TICK_COLOR, fontSize: 12 }} axisLine={false} tickLine={false} />
+      <YAxis tick={{ fill: TICK_COLOR, fontSize: 12 }} axisLine={false} tickLine={false} width={40} />
+      <Tooltip content={<CustomTooltip />}
+        cursor={{ fill: "transparent" }} />
+      <Bar
+        dataKey="value"
+        radius={[10, 10, 0, 0]}
+        isAnimationActive={false}
+        activeBar={false}
+        background={false}
+      >
+        {["FALSE POSITIVE", "CANDIDATE", "CONFIRMED"].map((cls, i) => (
+          <Cell key={i} fill={CLASS_COLORS[cls] || "#a3a3a3"} />
+        ))}
+      </Bar>
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+
+  </div>
+)}
+
+
 
           {results.length > 0 && (
             <Card className="glass-card border-border/50 animate-fade-in">
@@ -324,18 +521,18 @@ const getOrderedKeys = (rows: any[]) => {
                               <TableCell key={key}>
                                 {key === "classification" ? (
                                   <span
-                                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                      row[key] === "CANDIDATE"
-                                        ? "bg-blue-900/40 text-blue-300 border border-blue-500/50"
-                                        : row[key] === "CONFIRMED"
-                                        ? "bg-green-900/40 text-green-300 border border-green-500/50"
-                                        : row[key] === "FALSE POSITIVE"
-                                        ? "bg-red-900/40 text-red-300 border border-red-500/50"
-                                        : "bg-gray-800/40 text-gray-300 border border-gray-600/50"
-                                    }`}
-                                  >
-                                    {row[key]}
-                                  </span>
+                                      className={`px-2 py-1 rounded-full text-xs font-semibold transition-colors ${
+                                        row[key] === "CANDIDATE"
+                                          ? "bg-amber-100 text-amber-800 border border-amber-400 dark:bg-amber-900/40 dark:text-amber-300 dark:border-amber-500/50"
+                                          : row[key] === "CONFIRMED"
+                                          ? "bg-green-100 text-green-800 border border-green-400 dark:bg-green-900/40 dark:text-green-300 dark:border-green-500/50"
+                                          : row[key] === "FALSE POSITIVE"
+                                          ? "bg-red-100 text-red-800 border border-red-400 dark:bg-red-900/40 dark:text-red-300 dark:border-red-500/50"
+                                          : "bg-gray-100 text-gray-800 border border-gray-400 dark:bg-gray-800/40 dark:text-gray-300 dark:border-gray-600/50"
+                                      }`}
+                                    >
+                                      {row[key]}
+                                    </span>
                                 ) : key === "Porbability Score" ? (
                                   <span className="font-semibold text-primary">
                                     {Number(row[key]).toFixed(2)}%
