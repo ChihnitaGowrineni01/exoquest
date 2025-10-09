@@ -26,12 +26,6 @@ export default function Inference() {
   const [results, setResults] = useState<any[]>([]);
   const { toast } = useToast();
 
-  const modelKey = (selectedModel as ModelKey) || 'kepler';
-  const spec = FEATURE_MAP[modelKey];
-  const ordered =
-    FEATURE_ORDER[modelKey]?.length && FEATURE_MAP[modelKey]
-      ? FEATURE_ORDER[modelKey].map(k => [k, FEATURE_MAP[modelKey][k]])
-      : Object.entries(FEATURE_MAP[modelKey] || {});
 // Features user can choose to visualize (supports common aliases + spaced headers)
 const FEATURE_CHOICES = [
   { label: "Planet Orbital Period", keys: ["Planet Orbital Period", "planet_orbital_period", "pl_orbper", "orbital_period"] },
